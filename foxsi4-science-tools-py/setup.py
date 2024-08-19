@@ -11,6 +11,7 @@ setuptools.setup(
             "matplotlib",
             "astropy",
             "sunpy",
+            "pyyaml",
         ],
     packages=setuptools.find_packages(),
     zip_safe=False
