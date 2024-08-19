@@ -1,0 +1,32 @@
+---
+    flight: 
+        foxsi4:
+            # information related directly to the FOXSI-4 flight
+            launch_time:
+                utc: "2024-04-17T22:13:00"
+                akdt: "2024-04-17T14:13:00"
+                clock: 0
+            shutter_open:
+                utc: "2024-04-17T22:14:13"
+                akdt: "2024-04-17T14:14:13"
+                clock: 73
+            observation_start:
+                utc: "2024-04-17T22:14:39.647"
+                akdt: "2024-04-17T14:14:39.647"
+                clock: 99.647
+            shutter_closed:
+                utc: "2024-04-17T22:20:41"
+                akdt: "2024-04-17T14:20:41"
+                clock: 461
+        hi-c:
+            # information related directly to the Hi-C flight
+            launch_time:
+                utc: "2024-04-17T22:14:00"
+                akdt: "2024-04-17T14:14:00"
+                clock: 60
+    flare:
+        time_of_interest: 
+            start: 
+                utc: "2024-04-17T21:57:00"
+            end: 
+                utc: "2024-04-17T22:30:00"
