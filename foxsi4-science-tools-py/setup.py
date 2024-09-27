@@ -6,6 +6,7 @@ setuptools.setup(
     description="Software used for FOXSI-4 science.",
     url="https://github.com/foxsi/foxsi4-science-tools",
     install_requires=[
+            "setuptools",
             "numpy", 
             "scipy",
             "matplotlib",
