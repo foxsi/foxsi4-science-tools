@@ -35,7 +35,15 @@ YAML files are very easy to use in multiple coding languages.
 
 #### In Python
 
-The file can be read in using tools in this repository with
+The file's information is readily available in the Python code via
+
+```python
+import foxsi4_science_tools_py as f4st
+
+print(f4st.obsInfo)
+```
+
+The file can be read in (almost) manually using tools in this repository with
 
 ```python
 from foxsi4_science_tools_py.io.load_yaml import load_obs_info
