@@ -14,6 +14,10 @@ setuptools.setup(
             "astropy",
             "sunpy",
             "pyyaml",
+            "bs4",
+            "lxml",
+            "zeep",
+            "drms",
         ],
     packages=setuptools.find_packages(),
     zip_safe=False

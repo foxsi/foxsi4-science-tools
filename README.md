@@ -8,7 +8,7 @@ This will aid in the download of data from co-observing instruments, for example
 
 **Note:** FOXSI-1, -2, and -3 used a completely different system for completely different types of observations compared to FOXSI-4. Therefore, this repository is only appropriate for FOXSI-4.
 
-## Flight Information
+## Observational Information and the YAML File
 
 <span>&#x1f6a7;</span> The information here is still under construction and may be edited in the future. <span>&#x1f6a7;</span>
 
@@ -26,6 +26,57 @@ Times for the flight may only be accurate to within a second. Hi-C launched 1 mi
 YouTube [link](https://www.youtube.com/watch?v=PYM2bRn-5ZY) to countdown audio at Poker Flat Research Range (FOXSI-PI call for count pick-up at timestamp 3:37:42, count picked up at timestamp 3:38:34).
 
 The M1 flare which the sounding rockets were launched on peaked at approximately 2024-04-17T22:08:00 (UTC) and so, for the full flare, the nominal time to investigate is between 2024-04-17T21:57:00$-$22:30:00.
+
+### YAML File
+
+As the repository developes, more information will be added to the [observation parameters YAML](observational-information/observation-parameters.yaml) file.
+
+YAML files are very easy to use in multiple coding languages.
+
+#### In Python
+
+The file's information is readily available in the Python code via
+
+```python
+import foxsi4_science_tools_py as f4st
+
+print(f4st.obsInfo)
+```
+
+The file can be read in (almost) manually using tools in this repository with
+
+```python
+from foxsi4_science_tools_py.io.load_yaml import load_obs_info
+
+obsInfo = load_obs_info()
+```
+
+or, [more generally](https://pyyaml.org/wiki/PyYAMLDocumentation),
+
+```python
+import yaml
+
+filename = "/path/to/yaml/file/observational-information/observation-parameters.yaml"
+
+with open(filename, "r") as file:
+    obsInfo = yaml.safe_load(file)
+```
+
+More information on how to access this information in the Python code contained in this repository, see the [README file for the Python package](foxsi4-science-tools-py/foxsi4_science_tools_py/README.md).
+
+#### In IDL
+
+The [syntax](https://www.nv5geospatialsoftware.com/docs/yaml_parse.html) appears to be very easy but seems to require IDLv9 so I have not tested this personally.
+
+```idl
+filename = "/path/to/yaml/file/observational-information/observation-parameters.yaml"
+
+obsInfo = yaml_parse(filename)
+```
+
+#### In C++
+
+Tools exist, such as `yaml-cpp` found [here](https://github.com/jbeder/yaml-cpp).
 
 ## Repository Aim
 

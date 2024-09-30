@@ -1,32 +1,43 @@
-"""File to host code that downloads SDO data."""
+"""
+File to host code that downloads SDO data.
+"""
+import logging
+import os
 
 import astropy.units as u
 from sunpy.net import Fido, attrs as a
-import os
 
-def sdo_download(start_time=None, end_time=None, directory="./", wave_values=None, get_hmi=False):
+import foxsi4_science_tools_py as f4st
+
+def sdo_download(start_time=None, end_time=None, directory=None, wave_values=None, get_hmi=False):
     """Allows the download of SDO/AIA and /HMI data.
+
+    If the files already exist in the same directory, they will not be
+    downloaded again.
+
+    *** Due to downloading stuff, this function might need to be run 
+    several times. ***
     
     Parameters
     ----------
     start_time : `str`, `None` 
-        The start time for the data. In the following format; e.g., 
-        "2024-04-17T21:57:00" which is the value taken if input is 
-        `None`.
+        The start time (UTC) for the data. In the following format; e.g., 
+        "2024-04-17T21:57:00". If `None` then the value is taken from
+        `foxsi4_science_tools_py.obsInfo["flare"]["time_of_interest"]["start"]["utc"]`.
         Default: None
     
     end_time : `str`, `None`
-        The end time for the data. In the following format; e.g., 
-        "2024-04-17T22:30:00" which is the value taken if input is 
-        `None`.
+        The end time (UTC) for the data. In the following format; e.g., 
+        "2024-04-17T22:30:00". If `None` then the value is taken from
+        `foxsi4_science_tools_py.obsInfo["flare"]["time_of_interest"]["end"]["utc"]`.
         Default: None
     
     directory : `str`
-        The directory where the SDO files will be saved. Should end in 
-        a "/". Default is the current directory.
-        Default: "./" 
+        The directory where the SDO files will be saved. Default is the
+        current directory. Default is `os.getcwd()` if `None`.
+        Default: None
     
-    wave_values : `list[int]`, None
+    wave_values : `list[int]`, `None`
         A list of the wavelengths (in angstroms) to be downloaded. For 
         example, [94, 131, 171, 211, 1600, 1700] which is the value 
         taken if input is `None`.
@@ -45,62 +56,55 @@ def sdo_download(start_time=None, end_time=None, directory="./", wave_values=Non
 
     Examples
     --------
-    ## Default behaviour for the FOXSI M1 flare time
+    # Default behaviour for the FOXSI M1 flare time
     >>> sdo_download()
 
-    ## Extend the time interval, download a subset of wavelengths, 
-    ## define a specific directory, and get the SDO/HMI data as well
+    # Extend the time interval, download a subset of wavelengths, 
+    # define a specific directory, and get the SDO/HMI data as well
     >>> sdo_download(start_time="2024-04-17T21:30:00", 
                      end_time="2024-04-17T22:45:00", 
                      directory="path/to/save/directory/", 
                      wave_values=[94,171], 
                      get_hmi=True)
 
-    ## Only download SDO/HMI LOS data
+    # Only download SDO/HMI LOS data
     >>> sdo_download(wave_values=[], get_hmi=True)
     """
-    # e.g., start_time, end_time = '2018-09-10T12:30:00', '2018-09-10T13:15:00'
-    # wave_values in angstroms
-
-    start_time = "2024-04-17T21:57:00" if start_time is None else start_time
-    end_time = "2024-04-17T22:30:00" if end_time is None else end_time
+    # set-up defaults
+    start_time = f4st.obsInfo["flare"]["time_of_interest"]["start"]["utc"] if start_time is None else start_time
+    end_time = f4st.obsInfo["flare"]["time_of_interest"]["end"]["utc"] if end_time is None else end_time
+    directory = os.getcwd() if directory is None else directory
     wave_values = [94, 131, 171, 193, 211, 304, 335, 1600, 1700] if wave_values is None else wave_values
 
+    # get ready for Sunpy
     time = a.Time(start_time, end_time)
-    aia = a.Instrument('AIA')
-    waves = wave_values*u.angstrom 
-    wave_dirs = [f"{wv}angstrom/" for wv in wave_values]
+    waves = [a.Wavelength(wv) for wv in wave_values<<u.angstrom] 
+    wave_dirs = [f"{wv}angstrom" for wv in wave_values]
+    instruments = [a.Instrument("AIA")]*len(waves)
+
+    # check if HMI is wanted
+    if get_hmi:
+        waves.append(a.Physobs("LOS_magnetic_field"))
+        wave_dirs.append("hmi")
+        instruments.append(a.Instrument("hmi"))
 
     needed_files = []
+    # for aia (and hmi?)
+    for inst, wave, wd in zip(instruments, waves, wave_dirs):
+        curr_wdir = os.path.join(directory, wd)
+        logging.info(f"Doing {curr_wdir}")
+        os.makedirs(curr_wdir, exist_ok=True) # make the directory if it isn't there
 
-    # for aia
-    for wave, wd in zip(waves, wave_dirs):
-        print("Doing "+directory+wd)
-        os.makedirs(directory+wd, exist_ok=True) # make the directory if it isn't there
-
-        search = (time, aia, a.Wavelength(wave))
-        fetch = {"path":directory+wd+"{file}"}
-
-        filepaths = fido_download(search, fetch)
-
-        # well try again with failed files
-        needed_files = handle_retries(filepaths, needed_files=needed_files)
-
-    # for hmi
-    if get_hmi:
-        print("Doing "+directory+"hmi")
-        os.makedirs(directory+"hmi", exist_ok=True) # make the directory if it isn't there
-
-        search = (time, a.Instrument('hmi'), a.Physobs('LOS_magnetic_field'))
-        fetch = {"path":directory+"hmi/{file}"}
+        search = (time, inst, wave)
+        fetch = {"path":os.path.join(curr_wdir, "{file}")}
 
         filepaths = fido_download(search, fetch)
 
         # well try again with failed files
         needed_files = handle_retries(filepaths, needed_files=needed_files)
 
-    print("Files Needed are:")
-    print(needed_files)
+    logging.info("Files Needed are:")
+    logging.info(needed_files)
 
     return needed_files
 
@@ -188,7 +192,7 @@ def handle_retries(filepaths, tries=5, needed_files=None):
     needed_files = [] if needed_files is None else needed_files
 
     for _ in range(tries):
-        print(f"Trying again for {filepaths.errors}")
+        logging.info(f"Trying again for {filepaths.errors}")
         filepaths = Fido.fetch(filepaths)
         if filepaths.errors == []:
             break
@@ -199,4 +203,9 @@ def handle_retries(filepaths, tries=5, needed_files=None):
     return needed_files
 
 if __name__=="__main__":
-    sdo_download(directory="./data/")
+    # sdo_download(directory="./data/")
+    sdo_download(start_time="2024-04-17T21:30:00", 
+                 end_time="2024-04-17T21:33:00",
+                 directory="./data_test/",
+                 wave_values=[171],
+                 get_hmi=True)
