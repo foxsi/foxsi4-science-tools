@@ -14,6 +14,6 @@ def load_yaml(filename):
 
     return file_info
 
-def load_context():
-    """Function to load in the context information from file. """
-    return load_yaml(os.path.join(pathlib.Path(__file__).parent, "..", "..", "..", "context-information", "context.yaml"))
+def load_obs_info():
+    """Function to load in the obs. information from file. """
+    return load_yaml(os.path.join(pathlib.Path(__file__).parent, "..", "..", "..", "observational-information", "observation-parameters.yaml"))

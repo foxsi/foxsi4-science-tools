@@ -4,7 +4,7 @@
 
 The base `foxsi4_science_tools_py` namespace includes:
 
-- `~foxsi4_science_tools_py.contextInfo`
+- `~foxsi4_science_tools_py.obsInfo`
   - The information stored in a YAML file that includes information from the flight and also the flare that was observed.
 
 ## Examples
@@ -13,11 +13,11 @@ The base `foxsi4_science_tools_py` namespace includes:
 # importing the module is as easy as:
 >>> import foxsi4_science_tools_py as f4st
 
-# then accessing, e.g., the context information for the flight/flare
->>> print(f4st.contextInfo)
+# then accessing, e.g., the observational information for the flight/flare
+>>> print(f4st.obsInfo)
 {'flight': {'foxsi4': {'launch_time': {'utc': '2024-04-17T22:13:00', 'akdt':...}
 
 # that can be accessed like a native Python dictionary
->>> print(f4st.contextInfo["flight"]["foxsi4"]["launch_time"]["clock"])
+>>> print(f4st.obsInfo["flight"]["foxsi4"]["launch_time"]["clock"])
 0
 ```

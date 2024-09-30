@@ -1,7 +1,7 @@
 """
 File to host code that downloads SDO data.
 """
-
+import logging
 import os
 
 import astropy.units as u
@@ -23,13 +23,13 @@ def sdo_download(start_time=None, end_time=None, directory=None, wave_values=Non
     start_time : `str`, `None` 
         The start time (UTC) for the data. In the following format; e.g., 
         "2024-04-17T21:57:00". If `None` then the value is taken from
-        `foxsi4_science_tools_py.contextInfo["flare"]["time_of_interest"]["start"]["utc"]`.
+        `foxsi4_science_tools_py.obsInfo["flare"]["time_of_interest"]["start"]["utc"]`.
         Default: None
     
     end_time : `str`, `None`
         The end time (UTC) for the data. In the following format; e.g., 
         "2024-04-17T22:30:00". If `None` then the value is taken from
-        `foxsi4_science_tools_py.contextInfo["flare"]["time_of_interest"]["end"]["utc"]`.
+        `foxsi4_science_tools_py.obsInfo["flare"]["time_of_interest"]["end"]["utc"]`.
         Default: None
     
     directory : `str`
@@ -71,8 +71,8 @@ def sdo_download(start_time=None, end_time=None, directory=None, wave_values=Non
     >>> sdo_download(wave_values=[], get_hmi=True)
     """
     # set-up defaults
-    start_time = f4st.contextInfo["flare"]["time_of_interest"]["start"]["utc"] if start_time is None else start_time
-    end_time = f4st.contextInfo["flare"]["time_of_interest"]["end"]["utc"] if end_time is None else end_time
+    start_time = f4st.obsInfo["flare"]["time_of_interest"]["start"]["utc"] if start_time is None else start_time
+    end_time = f4st.obsInfo["flare"]["time_of_interest"]["end"]["utc"] if end_time is None else end_time
     directory = os.getcwd() if directory is None else directory
     wave_values = [94, 131, 171, 193, 211, 304, 335, 1600, 1700] if wave_values is None else wave_values
 
@@ -92,7 +92,7 @@ def sdo_download(start_time=None, end_time=None, directory=None, wave_values=Non
     # for aia (and hmi?)
     for inst, wave, wd in zip(instruments, waves, wave_dirs):
         curr_wdir = os.path.join(directory, wd)
-        print(f"Doing {curr_wdir}")
+        logging.info(f"Doing {curr_wdir}")
         os.makedirs(curr_wdir, exist_ok=True) # make the directory if it isn't there
 
         search = (time, inst, wave)
@@ -103,8 +103,8 @@ def sdo_download(start_time=None, end_time=None, directory=None, wave_values=Non
         # well try again with failed files
         needed_files = handle_retries(filepaths, needed_files=needed_files)
 
-    print("Files Needed are:")
-    print(needed_files)
+    logging.info("Files Needed are:")
+    logging.info(needed_files)
 
     return needed_files
 
@@ -192,7 +192,7 @@ def handle_retries(filepaths, tries=5, needed_files=None):
     needed_files = [] if needed_files is None else needed_files
 
     for _ in range(tries):
-        print(f"Trying again for {filepaths.errors}")
+        logging.info(f"Trying again for {filepaths.errors}")
         filepaths = Fido.fetch(filepaths)
         if filepaths.errors == []:
             break
