@@ -59,8 +59,8 @@ x_range = [-550,-250]	# arcsec
 y_range = [-200,100]	# arcsec
 bin_size = 8			# image pixel size in arcsec
 n_bins = [int((x_range[1]-x_range[0])/bin_size),int((y_range[1]-y_range[0])/bin_size)]
-img, xedges, yedges = np.histogram2d( evt['solar_x_unaligned'], evt['solar_y_unaligned'], bins=n_bins, 
-                                      range=[x_range,y_range]  )
+img, xedges, yedges = np.histogram2d( evt['solar_x_unaligned'], evt['solar_y_unaligned'], 
+                                      bins=n_bins, range=[x_range,y_range]  )
 
 # plot the image
 plt.pcolormesh(xedges, yedges, img.T, shading='auto')
