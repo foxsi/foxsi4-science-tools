@@ -12,6 +12,8 @@ Directly below, I:
 1. Import all the packages I want to use.
 2. Define some global variables so they are easily changed:
    - CDTE_NUM is the CdTe number you want to look at (1-4)
+   - CDTE_FILE is the path and file you want loaded in
+      - I have it so that CDTE_NUM is used it it as well
    - ENERGIES, the type of energies you want to fit 
       - "Pt-side" (recommended) or "DOI"
    - SAVE_DIR=string if you want figures to be saved, else None
