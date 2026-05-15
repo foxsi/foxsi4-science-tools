@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 # Example here chooses a CdTe1 file. Also define a string with this information.
 # Don't forget to change the directory path to match YOUR path to the data.
 dir = "/Users/glesener/Dropbox/data/foxsi/20240417/cdte_lev3/"
-file = 'cdte1_level3_version1.fits'
+file = 'cdte1_level3_v2.fits'
 name = 'CdTe1'
 
 # Read in event data from the file
@@ -43,7 +43,7 @@ print(len(evt),'perfect events')
 # This code will need to change if so.
 t1 = Time('2024-04-17 22:14:45')
 t2 = Time('2024-04-17 22:17:45')
-evt = evt[ (evt['utc'] >= t1.unix) & (evt['utc'] <= t2.unix) ]
+evt = evt[ (Time(evt['utc']) >= t1) & (Time(evt['utc']) <= t2) ]
 print(len(evt),'events between',t1,'and',t2)
 
 # Select an energy range for the image
