@@ -5,7 +5,7 @@
 
 ;; Make sure to change the directory to wherever your data are.
 dir = '/Users/glesener/Dropbox/data/foxsi/20240417/cdte_lev3/'
-filename = 'cdte1_level3_version1.fits'
+filename = 'cdte1_level3_v2.fits'
 file = file_search( dir+filename )
 name = 'CdTe1'
 
@@ -24,7 +24,9 @@ t1 = '2024-04-17 22:14:45'
 t2 = '2024-04-17 22:17:45'
 t1 = anytim(t1)
 t2 = anytim(t2)
-evt = evt[ where( anytim(evt.utc,fiducial='sys') ge t1 and anytim(evt.utc,fiducial='sys') le t2 ) ]
+; commented line below was from when we used a numeric, not a string, for utc.
+;evt = evt[ where( anytim(evt.utc,fiducial='sys') ge t1 and anytim(evt.utc,fiducial='sys') le t2 ) ]
+evt = evt[ where( anytim(evt.utc) ge t1 and anytim(evt.utc) le t2 ) ]
 print, n_elements(evt), ' events between ', anytim(t1,/yo), ' and ', anytim(t2,/yo)
 
 ; Select an energy range for the image
