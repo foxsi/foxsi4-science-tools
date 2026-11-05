@@ -1,0 +1,16 @@
+[project]
+name = "foxsi4_science_tools_py"
+version = "0.1.0"
+description = "."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+            "setuptools",
+            "numpy",
+            "scipy",
+            "matplotlib",
+            "sunpy",
+            "pre-commit>=4.6.2",
+            "pip",
+            "shapely>=2.2.0",
+]

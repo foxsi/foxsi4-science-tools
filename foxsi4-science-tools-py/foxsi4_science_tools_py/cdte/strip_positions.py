@@ -2,6 +2,32 @@ from astropy import units as u
 import numpy as np
 from scipy.interpolate import interp1d
 
+from foxsi4_science_tools_py.cdte.constants import STRIP_TO_PITCH_MAPPING
+
+def get_hit_pitch(strip_position):
+    """Return the pitch to which the strip position belongs.
+    
+    Mapping:
+        Non-physical    : -2
+        Guard ring      : -1
+        Pitch of 60 um  :  0
+        Pitch of 80 um  :  1
+        Pitch of 100 um :  2
+    """
+    if (STRIP_TO_PITCH_MAPPING["GUARD_RING_A"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["GUARD_RING_A"][1]+1) or \
+        (STRIP_TO_PITCH_MAPPING["GUARD_RING_B"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["GUARD_RING_B"][1]+1):
+        return -1 # guard ring
+    elif (STRIP_TO_PITCH_MAPPING["REGION2_A"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["REGION2_A"][1]+1) or \
+        (STRIP_TO_PITCH_MAPPING["REGION2_B"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["REGION2_B"][1]+1):
+        return 2 # 100 um
+    elif (STRIP_TO_PITCH_MAPPING["REGION1_A"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["REGION1_A"][1]+1) or \
+        (STRIP_TO_PITCH_MAPPING["REGION1_B"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["REGION1_B"][1]+1):
+        return 1 # 80 um
+    elif (STRIP_TO_PITCH_MAPPING["REGION0"][0]<=strip_position<STRIP_TO_PITCH_MAPPING["REGION0"][1]+1):
+        return 0 # 60 um
+    else:
+        return -2 # non-physical
+
 def strip_ref_micrometers(chan, allow_float=False):
     """ This function returns the strip reference point in um.
 

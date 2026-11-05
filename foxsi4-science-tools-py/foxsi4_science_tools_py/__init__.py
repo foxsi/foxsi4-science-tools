@@ -24,7 +24,12 @@ Examples
 0
 """
 
+import matplotlib.colors
+
 from foxsi4_science_tools_py.io.load_yaml import load_obs_info
+
+IMAGE_COLORMAP = "Spectral_r"
+IMAGE_SCALE = matplotlib.colors.LogNorm()
 
 # for global observational info
 obsInfo = load_obs_info()
