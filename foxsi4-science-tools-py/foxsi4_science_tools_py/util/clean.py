@@ -16,6 +16,7 @@ class UsualSuspects:
     solar_y: u.Quantity
     signal: u.Quantity 
     extra_count_info: dict = field(default_factory=dict)
+    misc_info: dict = field(default_factory=dict)
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -35,7 +36,7 @@ class UsualSuspects:
             if len(self.extra_count_info)>0:
                 for k,v in self.extra_count_info.items():
                     _extra_count_info[k] = v[key]
-            return UsualSuspects(name=self.name, utc=utc, solar_x=solar_x, solar_y=solar_y, signal=signal, extra_count_info=_extra_count_info)
+            return UsualSuspects(name=self.name, utc=utc, solar_x=solar_x, solar_y=solar_y, signal=signal, extra_count_info=_extra_count_info, misc_info=self.misc_info)
         raise TypeError(f"Invalid subscript type: {type(key)}")
 
 def clean_cdte(event_list):
@@ -50,11 +51,15 @@ def _cdte_usual_suspects(event_list, name="cdte", signal_source="Pt-side"):
     elif signal_source=="Pt-side":
         signal = event_list["pt_gap_loss_corrected_merged_energy_list"][:, 0]
 
+    # extra CdTe information needed for analysis
     _pt_strips = event_list["pt_merged_position_list"][:,0]
     _pitch = np.array([get_hit_pitch(strip) for strip in _pt_strips])
-    extra_count_info = {"pitch":_pitch}
+    _livetime = event_list["livetime"]*1e-8 << u.second
+    extra_count_info = {"pitch":_pitch, "livetime":_livetime}
 
-    return UsualSuspects(name=name, utc=time, solar_x=solx, solar_y=soly, signal=signal<<u.keV, extra_count_info=extra_count_info)
+    misc_info = {"signal_source":signal_source}
+
+    return UsualSuspects(name=name, utc=time, solar_x=solx, solar_y=soly, signal=signal<<u.keV, extra_count_info=extra_count_info, misc_info=misc_info)
 
 def cdte_usual_suspects(event_list, name="cdte", signal_source="Pt-side"):
     return _cdte_usual_suspects(clean_cdte(event_list), name=name, signal_source=signal_source)
@@ -63,6 +68,15 @@ def clean_cmos(event_list):
     return event_list
 
 def _cmos_usual_suspects(event_list, name="cmos"):
+    # pre-energy calibration
+    time = Time("2024-04-17T00:00:00") + (event_list["TIME"]<<u.second)
+    solx = event_list["SOLAR_X"] << u.arcsec
+    soly = event_list["SOLAR_Y"] << u.arcsec
+    signal = event_list["ENERGY"] << u.keV
+    return UsualSuspects(name=name, utc=time, solar_x=solx, solar_y=soly, signal=signal)
+
+def _cmos_usual_suspects_old(event_list, name="cmos"):
+    # pre-energy calibration
     time = Time(event_list["utc"])
     solx = event_list["solar_x"] << u.arcsec
     soly = event_list["solar_y"] << u.arcsec

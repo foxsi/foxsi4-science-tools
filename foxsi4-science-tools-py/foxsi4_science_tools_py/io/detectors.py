@@ -14,6 +14,11 @@ def load_cdte(f):
     return [hdul[0].header, Table(hdul[1].data)]
 
 def load_cmos(f):
+    hdul = load_fits(f)
+    return [hdul[0].header, Table(hdul[1].data)]
+
+def load_cmos_old(f):
+    # pre-energy calibration
     return [cmos_header(f), cmos_construct(f)]
 
 def cmos_iter_event_chunks(path, chunk_rows):

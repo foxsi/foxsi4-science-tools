@@ -8,8 +8,20 @@ import sunpy.map
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 
+from foxsi4_science_tools_py.io.detectors import load_cdte, load_cmos
+from foxsi4_science_tools_py.util.clean import cdte_usual_suspects, cmos_usual_suspects
 from foxsi4_science_tools_py.util.maps import make_sunpy_map, assign_plot_settings, correlation_map_shift
 
+
+def cdte_events(cdte_file, name):
+    """Given a file, load in the CdTe data."""
+    cdte_data = load_cdte(cdte_file)[1]
+    return cdte_usual_suspects(cdte_data, name=name)
+
+def cmos_events(cmos_file, name):
+    """Given a file, load in the CdTe data."""
+    cmos_data = load_cmos(cmos_file)[1]
+    return cmos_usual_suspects(cmos_data, name=name)
 
 def full_disk_map(event_data, **kwargs):
     """Return a Sunpy map of the FOXSI data."""
@@ -169,7 +181,7 @@ def count_time_profile_array_from_start_stop_binning(
     start_time = np.min(event_data["utc"]) if start_time is None else start_time
     end_time = np.max(event_data["utc"]) if end_time is None else end_time
 
-    _st = 0
+    _st = 0 << u.second
     _et = (end_time-start_time).sec << u.second
 
     time_bins = np.arange(
@@ -201,7 +213,7 @@ def count_time_profile_array_from_binning_array(
     -------
     """
     start_time = time_bins[0]
-    time_bins_s = (time_bins-start_time).sec << u.second
-    count_times = (event_data["utc"]-start_time).sec << u.second
+    time_bins_s = np.array((time_bins-start_time).sec) << u.second
+    count_times = np.array((event_data["utc"]-start_time).sec) << u.second
     counts, time_bins = np.histogram(count_times.value, time_bins_s.value)
     return start_time+(time_bins<<u.second), counts << u.ct

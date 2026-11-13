@@ -10,6 +10,7 @@ __all__ = ["foxsi4_main_loop_roi",
 
 
 def foxsi4_main_loop_roi():
+    """A Shapely polygon containing the FOXSI-4 core flare region."""
     return ellipse_shape(center=[-365, -60]<<u.arcsec, semi_axis=[90, 35]<<u.arcsec, rotation=-16<<u.deg)
 
 def foxsi4_flux_rope_roi():
